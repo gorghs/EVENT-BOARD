@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Events - EventBoard</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>My Events</h1>
+            <nav>
+                <a href="/discover.html">Discover</a>
+                <button id="logout-btn">Logout</button>
+            </nav>
+        </header>
+
+        <div id="create-event-form">
+            <h2>Create New Event</h2>
+            <form id="event-form">
+                <input type="text" id="title" placeholder="Title" required>
+                <input type="datetime-local" id="date" required>
+                <input type="text" id="location" placeholder="Location">
+                <textarea id="description" placeholder="Description"></textarea>
+                <select id="status">
+                    <option value="draft">Draft</option>
+                    <option value="published">Published</option>
+                </select>
+                <button type="submit">Create Event</button>
+            </form>
+        </div>
+
+        <div class="filters">
+            <input type="text" id="search" placeholder="Search events...">
+            <select id="status-filter">
+                <option value="">All Statuses</option>
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+            </select>
+        </div>
+        <div id="events-container">
+            <!-- Events will be loaded here -->
+        </div>
+    </div>
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
