@@ -1,4 +1,5 @@
 const { db } = require('../config/db');
+const store = require('../utils/inMemoryStore');
 
 const createEvent = async (req, res) => {
     const { title, date, location, description, status } = req.body;
@@ -19,6 +20,10 @@ const createEvent = async (req, res) => {
         res.status(201).json({ id: newEvent.id, ...newEvent.data() });
     } catch (error) {
         console.error('Error creating event:', error);
+        if (process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production') {
+            const created = store.addEvent({ title, date, location, description, status, owner_id });
+            return res.status(201).json(created);
+        }
         res.status(500).json({ error: 'Server error' });
     }
 };
@@ -34,30 +39,35 @@ const getEvents = async (req, res) => {
             query = query.where('status', '==', status);
         }
 
-        if (search) {
-            query = query.where('title', '>=', search).where('title', '<=', search + '\uf8ff');
-        }
-
-        if (lastVisible) {
-            const lastVisibleDoc = await db.collection('events').doc(lastVisible).get();
-            query = query.startAfter(lastVisibleDoc);
-        }
-
-        query = query.limit(limit);
-
         const snapshot = await query.get();
-        const events = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        const newLastVisible = snapshot.docs[snapshot.docs.length - 1];
+        let events = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        res.json({ events, lastVisible: newLastVisible ? newLastVisible.id : null });
+        if (search) {
+            events = events.filter(event => event.title.toLowerCase().includes(search.toLowerCase()));
+        }
+
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+        const paginatedEvents = events.slice(startIndex, endIndex);
+
+        res.json({ events: paginatedEvents, total: events.length });
+
     } catch (error) {
         console.error('Error getting events:', error);
+        if (process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production') {
+            const events = store.listEvents(owner_id);
+            const startIndex = (page - 1) * limit;
+            const endIndex = page * limit;
+            const paginatedEvents = events.slice(startIndex, endIndex);
+            return res.json({ events: paginatedEvents, total: events.length });
+        }
         res.status(500).json({ error: 'Server error' });
     }
 };
 
 const getEventById = async (req, res) => {
     const { id } = req.params;
+    const owner_id = req.user.id;
 
     try {
         const eventRef = db.collection('events').doc(id);
@@ -65,9 +75,20 @@ const getEventById = async (req, res) => {
         if (!doc.exists) {
             return res.status(404).json({ error: 'Event not found.' });
         }
+
+        if (doc.data().owner_id !== owner_id) {
+            return res.status(403).json({ error: 'User not authorized to view this event' });
+        }
+
         res.json({ id: doc.id, ...doc.data() });
     } catch (error) {
         console.error('Error loading event:', error);
+        if (process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production') {
+            const found = store.getEvent(id);
+            if (!found) return res.status(404).json({ error: 'Event not found.' });
+            if (found.owner_id !== owner_id) return res.status(403).json({ error: 'User not authorized to view this event' });
+            return res.json(found);
+        }
         res.status(500).json({ error: 'Server error' });
     }
 };
@@ -83,19 +104,25 @@ const updateEvent = async (req, res) => {
             return res.status(404).json({ error: 'Event not found.' });
         }
 
-        await eventRef.update({
-            title,
-            date,
-            location,
-            description,
-            status,
-            updated_at: new Date(),
-        });
+        const updateData = {};
+        if (title) updateData.title = title;
+        if (date) updateData.date = date;
+        if (location) updateData.location = location;
+        if (description) updateData.description = description;
+        if (status) updateData.status = status;
+        updateData.updated_at = new Date();
+
+        await eventRef.update(updateData);
 
         const updatedDoc = await eventRef.get();
         res.json({ id: updatedDoc.id, ...updatedDoc.data() });
     } catch (error) {
         console.error('Error updating event:', error);
+        if (process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production') {
+            const updated = store.updateEvent(id, { title, date, location, description, status });
+            if (!updated) return res.status(404).json({ error: 'Event not found.' });
+            return res.json(updated);
+        }
         res.status(500).json({ error: 'Server error' });
     }
 };
@@ -114,6 +141,11 @@ const deleteEvent = async (req, res) => {
         res.status(204).send();
     } catch (error) {
         console.error('Error deleting event:', error);
+        if (process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production') {
+            const ok = store.deleteEvent(id);
+            if (!ok) return res.status(404).json({ error: 'Event not found.' });
+            return res.status(204).send();
+        }
         res.status(500).json({ error: 'Server error' });
     }
 };

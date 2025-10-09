@@ -8,22 +8,27 @@ import {
   Button,
   Typography,
   Box,
-  Grid,
-  Link,
 } from '@mui/material';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
+    if (!email || !password) {
+      setErrorMessage('Email and password are required');
+      return;
+    }
     try {
       const response = await api.post('/auth/login', { email, password });
       localStorage.setItem('token', response.data.token);
       navigate('/');
     } catch (error) {
+      setErrorMessage('Login failed');
       console.error('Login failed', error);
     }
   };
@@ -42,6 +47,11 @@ const LoginPage = () => {
           Login
         </Typography>
         <Box component="form" onSubmit={handleLogin} sx={{ mt: 1 }}>
+          {errorMessage && (
+            <Typography color="error" variant="body2">
+              {errorMessage}
+            </Typography>
+          )}
           <TextField
             margin="normal"
             required
@@ -74,13 +84,7 @@ const LoginPage = () => {
           >
             Sign In
           </Button>
-          <Grid container>
-              <Grid item>
-                <Link href="/register" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
+          {/** Register link removed per request */}
         </Box>
       </Box>
     </Container>

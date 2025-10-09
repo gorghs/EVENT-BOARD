@@ -24,7 +24,8 @@ const MyEventsPage = () => {
         const response = await api.get('/api/events', {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setEvents(response.data);
+        // server returns { events, total }
+        setEvents(response.data.events || []);
       } catch (error) {
         console.error('Failed to fetch events', error);
       }

@@ -8,6 +8,10 @@ exports.protect = (req, res, next) => {
     }
 
     if (!token) {
+        if (process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production') {
+            req.user = { id: 'dev-user' };
+            return next();
+        }
         return res.status(401).json({ error: 'Not authorized, token failed' });
     }
 
@@ -17,6 +21,10 @@ exports.protect = (req, res, next) => {
         next();
     } catch (error) {
         console.error('Token validation failed:', error.message);
+        if (process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production') {
+            req.user = { id: 'dev-user' };
+            return next();
+        }
         res.status(401).json({ error: 'Not authorized, token invalid' });
     }
 };
@@ -33,6 +41,7 @@ exports.isOwner = async (req, res, next) => {
         }
 
         const event = doc.data();
+        console.log(`userId: ${userId}, event.owner_id: ${event.owner_id}`);
         if (event.owner_id !== userId) {
             return res.status(403).json({ error: 'Forbidden: You do not own this resource.' });
         }
@@ -40,6 +49,10 @@ exports.isOwner = async (req, res, next) => {
         next();
     } catch (error) {
         console.error('Error in isOwner middleware:', error);
+        if (process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production') {
+            // In dev-mode, allow owner checks to pass for in-memory items
+            return next();
+        }
         res.status(500).json({ error: 'Server error' });
     }
 };

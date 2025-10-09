@@ -6,7 +6,7 @@ import theme from './theme/theme';
 import LoginPage from './pages/LoginPage';
 import DiscoverPage from './pages/DiscoverPage';
 import MyEventsPage from './pages/MyEventsPage';
-import RegisterPage from './pages/RegisterPage';
+// Removed RegisterPage per request
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
+          {/** Register route removed */}
           <Route path="/discover" element={<DiscoverPage />} />
           <Route path="/" element={<MyEventsPage />} />
         </Routes>

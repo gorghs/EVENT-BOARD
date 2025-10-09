@@ -32,20 +32,35 @@ const CreateEventForm = ({ onEventCreated }) => {
   const [date, setDate] = useState('');
   const [location, setLocation] = useState('');
   const [status, setStatus] = useState('draft');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
     try {
+      if (!title || title.trim().length < 3) {
+        setErrorMessage('Title must be at least 3 characters.');
+        return;
+      }
+      if (!date) {
+        setErrorMessage('Please select a date and time.');
+        return;
+      }
       const token = localStorage.getItem('token');
-      const response = await api.post('/api/events', { title, description, date, location, status }, {
+      const isoDate = new Date(date).toISOString();
+      const payload = { title, description, date: isoDate, location, status };
+      const response = await api.post('/api/events', payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
       onEventCreated(response.data);
       handleClose();
     } catch (error) {
+      const details = error?.response?.data?.details;
+      const msg = (Array.isArray(details) && details.join(' ')) || error?.response?.data?.error || 'Failed to create event';
+      setErrorMessage(msg);
       console.error('Failed to create event', error);
     }
   };
@@ -63,6 +78,11 @@ const CreateEventForm = ({ onEventCreated }) => {
           <Typography variant="h6" component="h2">
             Create Event
           </Typography>
+          {errorMessage && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              {errorMessage}
+            </Typography>
+          )}
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
             <TextField
               fullWidth

@@ -7,7 +7,7 @@ const validationMiddleware = require('../middleware/validationMiddleware');
 
 router.post('/', 
     authMiddleware.protect, 
-    validationMiddleware.validateEvent, 
+    validationMiddleware.validateEventCreate, 
     eventController.createEvent
 );
 
@@ -26,6 +26,7 @@ router.get('/:id',
 router.patch('/:id', 
     authMiddleware.protect, 
     authMiddleware.isOwner, 
+    validationMiddleware.validateEventUpdate, 
     eventController.updateEvent
 );
 

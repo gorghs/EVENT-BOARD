@@ -25,11 +25,20 @@ const EditEventForm = ({ event, onEventUpdated }) => {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [date, setDate] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
     if (event) {
       setTitle(event.title);
       setDescription(event.description);
+      // Convert ISO to input datetime-local format
+      if (event.date) {
+        const d = new Date(event.date);
+        const tzOffset = d.getTimezoneOffset() * 60000;
+        const localISO = new Date(d - tzOffset).toISOString().slice(0,16);
+        setDate(localISO);
+      }
     }
   }, [event]);
 
@@ -40,12 +49,18 @@ const EditEventForm = ({ event, onEventUpdated }) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const response = await api.patch(`/api/events/${event.id}`, { title, description }, {
+      const payload = { title, description };
+      if (date) {
+        payload.date = new Date(date).toISOString();
+      }
+      const response = await api.patch(`/api/events/${event.id}`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
       onEventUpdated(response.data);
       handleClose();
     } catch (error) {
+      const msg = error?.response?.data?.error || 'Failed to update event';
+      setErrorMessage(msg);
       console.error('Failed to update event', error);
     }
   };
@@ -79,6 +94,22 @@ const EditEventForm = ({ event, onEventUpdated }) => {
               rows={4}
               sx={{ mt: 2 }}
             />
+            <TextField
+              fullWidth
+              label="Date"
+              type="datetime-local"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              sx={{ mt: 2 }}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+            {errorMessage && (
+              <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                {errorMessage}
+              </Typography>
+            )}
             <Button type="submit" variant="contained" sx={{ mt: 2 }}>
               Update
             </Button>

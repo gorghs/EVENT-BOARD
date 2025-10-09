@@ -10,6 +10,15 @@ const login = async (req, res) => {
     }
 
     try {
+        // Dev-mode shortcut: allow login without Firestore
+        if (process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production') {
+            const payload = { id: email };
+            const token = jwt.sign(payload, process.env.JWT_SECRET || 'dev-secret', {
+                expiresIn: process.env.JWT_EXPIRES_IN || '24h',
+            });
+            return res.json({ token });
+        }
+
         const usersRef = db.collection('users');
         const snapshot = await usersRef.where('email', '==', email).get();
 
@@ -34,11 +43,17 @@ const login = async (req, res) => {
             expiresIn: process.env.JWT_EXPIRES_IN,
         });
 
-        res.json({
-            token,
-        });
+        res.json({ token });
     } catch (error) {
         console.error('Login error:', error);
+        // Optional fallback on Firestore errors in dev
+        if (process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production') {
+            const payload = { id: email };
+            const token = jwt.sign(payload, process.env.JWT_SECRET || 'dev-secret', {
+                expiresIn: process.env.JWT_EXPIRES_IN || '24h',
+            });
+            return res.json({ token });
+        }
         res.status(500).json({ error: 'Server error' });
     }
 };
@@ -75,11 +90,17 @@ const register = async (req, res) => {
             expiresIn: process.env.JWT_EXPIRES_IN,
         });
 
-        res.status(201).json({
-            token,
-        });
+        res.status(201).json({ token });
     } catch (error) {
         console.error('Registration error:', error);
+        // In dev, allow implicit registration when Firestore is unavailable
+        if (process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production') {
+            const payload = { id: email };
+            const token = jwt.sign(payload, process.env.JWT_SECRET || 'dev-secret', {
+                expiresIn: process.env.JWT_EXPIRES_IN || '24h',
+            });
+            return res.status(201).json({ token });
+        }
         res.status(500).json({ error: 'Server error' });
     }
 };
