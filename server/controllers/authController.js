@@ -1,24 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const db = require('../config/db');
-
-const seedUser = async () => {
-    const email = 'alice@example.com';
-    const password = 'password';
-
-    try {
-        const userExists = await db.query('SELECT * FROM users WHERE email = $1', [email]);
-
-        if (userExists.rows.length === 0) {
-            const salt = await bcrypt.genSalt(10);
-            const password_hash = await bcrypt.hash(password, salt);
-            await db.query('INSERT INTO users (email, password_hash) VALUES ($1, $2)', [email, password_hash]);
-            console.log('👤 Seed user alice@example.com created.');
-        }
-    } catch (error) {
-        console.error('Error seeding user:', error);
-    }
-};
+const { db } = require('../config/db');
 
 const login = async (req, res) => {
     const { email, password } = req.body;
@@ -28,12 +10,15 @@ const login = async (req, res) => {
     }
 
     try {
-        const result = await db.query('SELECT * FROM users WHERE email = $1', [email]);
-        const user = result.rows[0];
+        const usersRef = db.collection('users');
+        const snapshot = await usersRef.where('email', '==', email).get();
 
-        if (!user) {
+        if (snapshot.empty) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
+
+        const user = snapshot.docs[0].data();
+        const userId = snapshot.docs[0].id;
 
         const isMatch = await bcrypt.compare(password, user.password_hash);
 
@@ -42,7 +27,7 @@ const login = async (req, res) => {
         }
 
         const payload = {
-            id: user.id,
+            id: userId,
         };
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
@@ -58,7 +43,48 @@ const login = async (req, res) => {
     }
 };
 
+
+const register = async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Please provide email and password' });
+    }
+
+    try {
+        const usersRef = db.collection('users');
+        const snapshot = await usersRef.where('email', '==', email).get();
+
+        if (!snapshot.empty) {
+            return res.status(400).json({ error: 'User already exists' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const password_hash = await bcrypt.hash(password, salt);
+
+        const newUserRef = await usersRef.add({
+            email,
+            password_hash,
+        });
+
+        const payload = {
+            id: newUserRef.id,
+        };
+
+        const token = jwt.sign(payload, process.env.JWT_SECRET, {
+            expiresIn: process.env.JWT_EXPIRES_IN,
+        });
+
+        res.status(201).json({
+            token,
+        });
+    } catch (error) {
+        console.error('Registration error:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
 module.exports = {
-    seedUser,
     login,
+    register,
 };

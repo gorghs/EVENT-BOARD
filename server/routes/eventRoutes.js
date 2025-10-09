@@ -20,20 +20,17 @@ router.get('/public-events', publicEventAdapter.getPublicEvents);
 
 router.get('/:id', 
     authMiddleware.protect, 
-    eventController.loadEvent, 
     eventController.getEventById
 );
 
 router.patch('/:id', 
     authMiddleware.protect, 
-    eventController.loadEvent, 
     authMiddleware.isOwner, 
     eventController.updateEvent
 );
 
 router.delete('/:id', 
     authMiddleware.protect, 
-    eventController.loadEvent, 
     authMiddleware.isOwner, 
     eventController.deleteEvent
 );

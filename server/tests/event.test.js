@@ -1,14 +1,36 @@
 const request = require('supertest');
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const db = require('../config/db');
+const { db } = require('../config/db');
 const axios = require('axios');
 const authRoutes = require('../routes/authRoutes');
 const eventRoutes = require('../routes/eventRoutes');
 const webhookRoutes = require('../routes/webhookRoutes');
 
 // Mock dependencies
-jest.mock('../config/db', () => ({ query: jest.fn() }));
+jest.mock('firebase-admin', () => ({
+    credential: {
+        cert: jest.fn(),
+    },
+    initializeApp: jest.fn(),
+    firestore: jest.fn(() => ({
+        collection: jest.fn(() => ({
+            where: jest.fn(() => ({
+                get: jest.fn(),
+                where: jest.fn(() => ({
+                    get: jest.fn(),
+                })),
+            })),
+            add: jest.fn(),
+            doc: jest.fn(() => ({
+                get: jest.fn(),
+                update: jest.fn(),
+                delete: jest.fn(),
+                set: jest.fn(),
+            })),
+        })),
+    })),
+}));
 jest.mock('axios');
 
 const app = express();
@@ -32,7 +54,7 @@ afterAll((done) => {
 describe('EventBoard API', () => {
     let aliceToken;
     let bobToken;
-    let eventId = 123;
+    let eventId = '123';
 
     beforeAll(async () => {
         const alicePassword = 'password';
@@ -40,21 +62,77 @@ describe('EventBoard API', () => {
         const aliceHash = await bcrypt.hash(alicePassword, 10);
         const bobHash = await bcrypt.hash(bobPassword, 10);
 
-        db.query.mockImplementation((sql, values) => {
-            if (sql.startsWith('SELECT * FROM users WHERE email')) {
-                if (values[0] === 'alice@example.com') return Promise.resolve({ rows: [{ id: 1, email: 'alice@example.com', password_hash: aliceHash }] });
-                if (values[0] === 'bob@example.com') return Promise.resolve({ rows: [{ id: 2, email: 'bob@example.com', password_hash: bobHash }] });
-                return Promise.resolve({ rows: [] });
+        const firestore = db;
+        firestore.collection.mockImplementation((collection) => {
+            if (collection === 'users') {
+                return {
+                    where: jest.fn((field, op, value) => {
+                        if (value === 'alice@example.com') {
+                            return {
+                                get: jest.fn(() => Promise.resolve({
+                                    empty: false,
+                                    docs: [{
+                                        id: '1',
+                                        data: () => ({ email: 'alice@example.com', password_hash: aliceHash }),
+                                    }],
+                                })),
+                            };
+                        }
+                        if (value === 'bob@example.com') {
+                            return {
+                                get: jest.fn(() => Promise.resolve({
+                                    empty: false,
+                                    docs: [{
+                                        id: '2',
+                                        data: () => ({ email: 'bob@example.com', password_hash: bobHash }),
+                                    }],
+                                })),
+                            };
+                        }
+                        return {
+                            get: jest.fn(() => Promise.resolve({ empty: true })),
+                        };
+                    }),
+                    add: jest.fn(() => Promise.resolve({ id: 'newUser' })),
+                };
             }
-            if (sql.startsWith('INSERT INTO events')) return Promise.resolve({ rows: [{ id: eventId, owner_id: 1, ...values }] });
-            if (sql.startsWith('SELECT * FROM events WHERE id')) return Promise.resolve({ rows: [{ id: eventId, owner_id: values[0] === 1 ? 1 : 2 }] });
-            if (sql.startsWith('SELECT * FROM events WHERE owner_id')) return Promise.resolve({ rows: [{ id: eventId, owner_id: 1, title: 'Test Event' }] });
-            if (sql.startsWith('DELETE FROM events')) return Promise.resolve({ rowCount: 1 });
-            if (sql.startsWith('UPDATE events')) return Promise.resolve({ rows: [{ id: eventId, owner_id: 1, status: 'published' }] });
-            if (sql.startsWith('SELECT delivery_id')) return Promise.resolve({ rows: [] });
-            if (sql.startsWith('INSERT INTO webhook_deliveries')) return Promise.resolve({ rows: [] });
-            return Promise.resolve({ rows: [] });
+            if (collection === 'events') {
+                return {
+                    add: jest.fn(() => Promise.resolve({ id: eventId, get: () => Promise.resolve({ id: eventId, data: () => ({ owner_id: '1' }) }) })),
+                    doc: jest.fn((docId) => ({
+                        get: jest.fn(() => {
+                            if (docId === eventId) {
+                                return Promise.resolve({ exists: true, id: eventId, data: () => ({ owner_id: '1' }) });
+                            }
+                            return Promise.resolve({ exists: false });
+                        }),
+                        update: jest.fn(() => Promise.resolve()),
+                        delete: jest.fn(() => Promise.resolve()),
+                    })),
+                    where: jest.fn(() => ({
+                        orderBy: jest.fn(() => ({
+                            limit: jest.fn(() => ({
+                                get: jest.fn(() => Promise.resolve({
+                                    docs: [{
+                                        id: eventId,
+                                        data: () => ({ owner_id: '1', title: 'Test Event' }),
+                                    }],
+                                }))
+                            }))
+                        }))
+                    })),
+                };
+            }
+            if (collection === 'webhook_deliveries') {
+                return {
+                    doc: jest.fn(() => ({
+                        get: jest.fn(() => Promise.resolve({ exists: false })),
+                        set: jest.fn(() => Promise.resolve()),
+                    })),
+                };
+            }
         });
+
 
         const aliceRes = await request(app).post('/auth/login').send({ email: 'alice@example.com', password: alicePassword });
         aliceToken = aliceRes.body.token;
@@ -75,8 +153,8 @@ describe('EventBoard API', () => {
     test('should list all events for the authenticated user', async () => {
         const res = await request(app).get('/api/events').set('Authorization', `Bearer ${aliceToken}`);
         expect(res.statusCode).toEqual(200);
-        expect(Array.isArray(res.body)).toBe(true);
-        expect(res.body.length).toBeGreaterThan(0);
+        expect(Array.isArray(res.body.events)).toBe(true);
+        expect(res.body.events.length).toBeGreaterThan(0);
     });
 
     test('should delete an event for the owner', async () => {

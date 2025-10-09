@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { db } = require('../config/db');
 
 exports.protect = (req, res, next) => {
     let token;
@@ -20,10 +21,25 @@ exports.protect = (req, res, next) => {
     }
 };
 
-exports.isOwner = (req, res, next) => {
-    // This will be used in eventController, assuming req.event has been loaded.
-    if (req.event && req.event.owner_id === req.user.id) {
-        return next();
+exports.isOwner = async (req, res, next) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+
+    try {
+        const eventRef = db.collection('events').doc(id);
+        const doc = await eventRef.get();
+        if (!doc.exists) {
+            return res.status(404).json({ error: 'Event not found.' });
+        }
+
+        const event = doc.data();
+        if (event.owner_id !== userId) {
+            return res.status(403).json({ error: 'Forbidden: You do not own this resource.' });
+        }
+
+        next();
+    } catch (error) {
+        console.error('Error in isOwner middleware:', error);
+        res.status(500).json({ error: 'Server error' });
     }
-    res.status(403).json({ error: 'Forbidden: You do not own this resource.' });
 };
