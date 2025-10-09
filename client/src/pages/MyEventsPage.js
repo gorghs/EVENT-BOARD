@@ -45,6 +45,15 @@ const MyEventsPage = () => {
     setEvents([...events, newEvent]);
   }
 
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/api/events/${id}`);
+      setEvents(events.filter(event => event.id !== id));
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+    }
+  };
+
   if (!isAuthenticated) {
     return null; // Or a loading spinner
   }
@@ -63,7 +72,7 @@ const MyEventsPage = () => {
         </Box>
       </Box>
       <CreateEventForm onEventCreated={onEventCreated} />
-      <EventList events={events} setEvents={setEvents} />
+      <EventList events={events} setEvents={setEvents} onDelete={handleDelete} />
     </Container>
   );
 };

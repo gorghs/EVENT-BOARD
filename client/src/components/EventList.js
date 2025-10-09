@@ -10,22 +10,10 @@ import {
   Box,
 } from '@mui/material';
 
-const EventList = ({ events, setEvents }) => {
+const EventList = ({ events, setEvents, onDelete }) => {
   const onEventUpdated = (updatedEvent) => {
     setEvents(events.map(event => event.id === updatedEvent.id ? updatedEvent : event));
   }
-
-  const handleDelete = async (id) => {
-    try {
-      const token = localStorage.getItem('token');
-      await api.delete(`/api/events/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setEvents(events.filter((event) => event.id !== id));
-    } catch (error) {
-      console.error('Failed to delete event', error);
-    }
-  };
 
   return (
     <Grid container spacing={2}>
@@ -37,7 +25,7 @@ const EventList = ({ events, setEvents }) => {
               <Typography variant="body2">{event.description}</Typography>
               <Box sx={{ mt: 2 }}>
                 <EditEventForm event={event} onEventUpdated={onEventUpdated} />
-                <Button variant="contained" color="secondary" onClick={() => handleDelete(event.id)}>Delete</Button>
+                <Button variant="contained" color="secondary" onClick={() => onDelete(event.id)}>Delete</Button>
               </Box>
             </CardContent>
           </Card>
