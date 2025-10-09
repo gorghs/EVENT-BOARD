@@ -37,11 +37,21 @@ exports.isOwner = async (req, res, next) => {
         const eventRef = db.collection('events').doc(id);
         const doc = await eventRef.get();
         if (!doc.exists) {
+            // Fallback to in-memory store in dev mode if document not found in Firestore
+            if (process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production') {
+                const event = store.getEvent(id);
+                if (!event) {
+                    return res.status(404).json({ error: 'Event not found.' });
+                }
+                if (event.owner_id !== userId) {
+                    return res.status(403).json({ error: 'Forbidden: You do not own this resource.' });
+                }
+                return next();
+            }
             return res.status(404).json({ error: 'Event not found.' });
         }
 
         const event = doc.data();
-        console.log(`userId: ${userId}, event.owner_id: ${event.owner_id}`);
         if (event.owner_id !== userId) {
             return res.status(403).json({ error: 'Forbidden: You do not own this resource.' });
         }
@@ -49,8 +59,15 @@ exports.isOwner = async (req, res, next) => {
         next();
     } catch (error) {
         console.error('Error in isOwner middleware:', error);
+        // Fallback for when Firestore is unavailable in dev mode
         if (process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production') {
-            // In dev-mode, allow owner checks to pass for in-memory items
+            const event = store.getEvent(id);
+            if (!event) {
+                return res.status(404).json({ error: 'Event not found.' });
+            }
+            if (event.owner_id !== userId) {
+                return res.status(403).json({ error: 'Forbidden: You do not own this resource.' });
+            }
             return next();
         }
         res.status(500).json({ error: 'Server error' });

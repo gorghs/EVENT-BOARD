@@ -95,6 +95,7 @@ const getEventById = async (req, res) => {
 
 const updateEvent = async (req, res) => {
     const { id } = req.params;
+    const owner_id = req.user.id; // Get owner_id from the request
     const { title, date, location, description, status } = req.body;
 
     try {
@@ -119,7 +120,7 @@ const updateEvent = async (req, res) => {
     } catch (error) {
         console.error('Error updating event:', error);
         if (process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production') {
-            const updated = store.updateEvent(id, { title, date, location, description, status });
+            const updated = store.updateEvent(id, owner_id, { title, date, location, description, status });
             if (!updated) return res.status(404).json({ error: 'Event not found.' });
             return res.json(updated);
         }
@@ -129,6 +130,7 @@ const updateEvent = async (req, res) => {
 
 const deleteEvent = async (req, res) => {
     const { id } = req.params;
+    const owner_id = req.user.id; // Get owner_id from the request
 
     try {
         const eventRef = db.collection('events').doc(id);
@@ -142,7 +144,7 @@ const deleteEvent = async (req, res) => {
     } catch (error) {
         console.error('Error deleting event:', error);
         if (process.env.ALLOW_DEV_LOGIN === 'true' && process.env.NODE_ENV !== 'production') {
-            const ok = store.deleteEvent(id);
+            const ok = store.deleteEvent(id, owner_id);
             if (!ok) return res.status(404).json({ error: 'Event not found.' });
             return res.status(204).send();
         }
