@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 // Seed a user
 const salt = bcrypt.genSaltSync(10);
@@ -21,13 +22,15 @@ exports.getEventsByOwner = (owner_id) => events.filter(e => e.owner_id === owner
 exports.getEventById = (id) => events.find(e => e.id === id);
 
 exports.createEvent = (eventData) => {
+    console.log('inMemoryDb: Events before create:', events.length); // Added log
     const newEvent = {
         ...eventData,
-        id: String(Math.floor(Math.random() * 100000)),
+        id: crypto.randomUUID(),
         created_at: new Date(),
         updated_at: new Date(),
     };
     events.push(newEvent);
+    console.log('inMemoryDb: Events after create:', events.length, newEvent.id); // Added log
     return newEvent;
 };
 

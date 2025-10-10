@@ -71,13 +71,13 @@ const CreateEventForm = React.forwardRef(({ onEventCreated, onClose, TransitionC
             </Select>
           </FormControl>
         </Box>
+        <DialogActions>
+          <Button onClick={onClose} variant="outlined" disabled={loading}>Cancel</Button>
+          <Button type="submit" variant="contained" disabled={loading} startIcon={loading ? <CircularProgress size={20} /> : null}>
+            {loading ? 'Creating...' : 'Create Event'}
+          </Button>
+        </DialogActions>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} variant="outlined" disabled={loading}>Cancel</Button>
-        <Button type="submit" variant="contained" disabled={loading} startIcon={loading ? <CircularProgress size={20} /> : null}>
-          {loading ? 'Creating...' : 'Create Event'}
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 });

@@ -4,8 +4,11 @@ const createEvent = async (req, res) => {
     const { title, date, location, description, status } = req.body;
     const owner_id = req.user.id;
 
+
+
     try {
         const newEvent = inMemoryDb.createEvent({ title, date, location, description, status, owner_id });
+
         res.status(201).json(newEvent);
     } catch (error) {
         console.error('Error creating event:', error);

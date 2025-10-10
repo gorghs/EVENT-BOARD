@@ -95,3 +95,4 @@ GET https://your-backend-domain.com/healthz
 ```
 
 Expected response: `OK`
+
