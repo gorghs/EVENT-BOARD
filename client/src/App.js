@@ -14,10 +14,10 @@ function App() {
       <CssBaseline />
       <Router>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<LoginPage />} />
           {/** Register route removed */}
           <Route path="/discover" element={<DiscoverPage />} />
-          <Route path="/" element={<MyEventsPage />} />
+          <Route path="/my-events" element={<MyEventsPage />} />
         </Routes>
       </Router>
     </ThemeProvider>

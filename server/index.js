@@ -7,6 +7,7 @@ require('dotenv').config();
 const authRoutes = require('./routes/authRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
+const { seedUser } = require('./controllers/authController');
 
 
 const app = express();
@@ -34,7 +35,9 @@ app.use('/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/webhooks', webhookRoutes);
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`🚀 Server running on port ${PORT}`);
-
+    
+    // Seed the test user
+    await seedUser();
 });

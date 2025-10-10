@@ -111,13 +111,11 @@ describe('EventBoard API', () => {
                     })),
                     where: jest.fn(() => ({
                         orderBy: jest.fn(() => ({
-                            limit: jest.fn(() => ({
-                                get: jest.fn(() => Promise.resolve({
-                                    docs: [{
-                                        id: eventId,
-                                        data: () => ({ owner_id: '1', title: 'Test Event' }),
-                                    }],
-                                }))
+                            get: jest.fn(() => Promise.resolve({
+                                docs: [{
+                                    id: eventId,
+                                    data: () => ({ owner_id: '1', title: 'Test Event' }),
+                                }],
                             }))
                         }))
                     })),
@@ -163,8 +161,13 @@ describe('EventBoard API', () => {
     });
 
     test('should fetch public events', async () => {
-        const mockEvents = [{ id: 1, title: 'Public Event', body: 'Public event body', created_at: new Date().toISOString(), user: { login: 'github' } }];
-        axios.get.mockResolvedValue({ data: mockEvents });
+        const mockGitHubEvents = [{ id: 1, title: 'Public Event', body: 'Public event body', created_at: new Date().toISOString(), user: { login: 'github' } }];
+        const mockTicketmasterEvents = { _embedded: { events: [{ id: 2, name: 'Ticketmaster Event', dates: { start: { dateTime: new Date().toISOString() } }, _embedded: { venues: [{ name: 'Test Venue' }] }, info: 'Event info' }] } };
+        
+        axios.get
+            .mockResolvedValueOnce({ data: mockGitHubEvents })
+            .mockResolvedValueOnce({ data: mockTicketmasterEvents });
+            
         const res = await request(app).get('/api/events/public-events');
         expect(res.statusCode).toEqual(200);
         expect(Array.isArray(res.body)).toBe(true);
