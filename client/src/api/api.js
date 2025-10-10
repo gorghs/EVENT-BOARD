@@ -1,6 +1,5 @@
 
 import axios from 'axios';
-'
 
 const api = axios.create({
   baseURL: 'https://event-board-api.onrender.com',
