@@ -163,9 +163,11 @@ const MyEventsPage = () => {
           </Box>
       </Container>
 
-      <Dialog open={openCreateModal} onClose={() => setOpenCreateModal(false)} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} TransitionComponent={Slide}>
-        <CreateEventForm onEventCreated={onEventCreated} onClose={() => setOpenCreateModal(false)} TransitionComponent={Slide} />
-      </Dialog>
+      {openCreateModal && (
+        <Dialog open={openCreateModal} onClose={() => setOpenCreateModal(false)} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} TransitionComponent={Slide}>
+          <CreateEventForm onEventCreated={onEventCreated} onClose={() => setOpenCreateModal(false)} TransitionComponent={Slide} />
+        </Dialog>
+      )}
     </Box>
   );
 };

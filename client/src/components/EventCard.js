@@ -132,13 +132,15 @@ const EventCard = ({ event, onEventUpdated, onEventDeleted }) => {
       </Paper>
 
       {/* Edit Modal */}
-      <EditEventForm 
-        event={event} 
-        open={editModalOpen} 
-        onClose={() => setEditModalOpen(false)} 
-        onEventUpdated={onEventUpdated} 
-        TransitionComponent={Slide}
-      />
+      {editModalOpen && (
+        <EditEventForm 
+          event={event} 
+          open={editModalOpen} 
+          onClose={() => setEditModalOpen(false)} 
+          onEventUpdated={onEventUpdated} 
+          TransitionComponent={Slide}
+        />
+      )}
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="xs" TransitionComponent={Slide}>
