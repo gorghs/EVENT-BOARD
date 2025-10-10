@@ -32,7 +32,6 @@ const DiscoverPage = () => {
         const response = await api.get('/api/events/public-events');
         setEvents(response.data);
       } catch (err) {
-        console.error('Failed to fetch public events', err);
         setError('Failed to load public events. The API might be down or rate-limited.');
       } finally {
         setLoading(false);

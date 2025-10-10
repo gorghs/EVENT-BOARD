@@ -30,7 +30,6 @@ const LoginPage = () => {
       navigate('/my-events');
     } catch (error) {
       setErrorMessage('Login failed. Please check your credentials.');
-      console.error('Login failed', error);
     } finally {
       setLoading(false);
     }

@@ -86,7 +86,6 @@ const EditEventForm = React.forwardRef(({ event, open, onClose, onEventUpdated, 
     } catch (error) {
       const msg = error?.response?.data?.error || 'Failed to update event';
       setErrorMessage(msg);
-      console.error('Failed to update event', error);
     } finally {
       setLoading(false);
     }

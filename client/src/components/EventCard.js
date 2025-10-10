@@ -58,7 +58,6 @@ const EventCard = ({ event, onEventUpdated, onEventDeleted }) => {
       onEventDeleted(event.id);
       setDeleteDialogOpen(false);
     } catch (error) {
-      console.error('Failed to delete event', error);
     }
   };
 

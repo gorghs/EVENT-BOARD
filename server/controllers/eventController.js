@@ -62,26 +62,28 @@ const getEventById = async (req, res) => {
 const updateEvent = async (req, res) => {
     const { id } = req.params;
     const { title, date, location, description, status } = req.body;
+    const owner_id = req.user.id;
 
     try {
-        const updatedEvent = inMemoryDb.updateEvent(id, { title, date, location, description, status });
+        const updatedEvent = inMemoryDb.updateEvent(id, owner_id, { title, date, location, description, status });
         if (!updatedEvent) {
-            return res.status(404).json({ error: 'Event not found.' });
+            return res.status(404).json({ error: 'Event not found or user not authorized.' });
         }
         res.json(updatedEvent);
     } catch (error) {
-        console.error('Error updating event:', error);
+        console.error('[eventController.updateEvent] Error updating event:', error);
         res.status(500).json({ error: 'Server error' });
     }
 };
 
 const deleteEvent = async (req, res) => {
     const { id } = req.params;
+    const owner_id = req.user.id;
 
     try {
-        const success = inMemoryDb.deleteEvent(id);
+        const success = inMemoryDb.deleteEvent(id, owner_id);
         if (!success) {
-            return res.status(404).json({ error: 'Event not found.' });
+            return res.status(404).json({ error: 'Event not found or user not authorized.' });
         }
         res.status(204).send();
     } catch (error) {

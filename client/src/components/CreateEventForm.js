@@ -57,7 +57,7 @@ const CreateEventForm = React.forwardRef(({ onEventCreated, onClose, TransitionC
       <DialogContent>
         {errorMessage && <Alert severity="error" sx={{ mb: 2 }}>{errorMessage}</Alert>}
         
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+        <Box sx={{ mt: 1 }}>
           <TextField fullWidth label="Event Title" value={title} onChange={(e) => setTitle(e.target.value)} required sx={{ mb: 2 }} />
           <TextField fullWidth label="Description" value={description} onChange={(e) => setDescription(e.target.value)} multiline rows={4} sx={{ mb: 2 }} />
           <TextField fullWidth label="Location" value={location} onChange={(e) => setLocation(e.target.value)} sx={{ mb: 2 }} />
@@ -71,13 +71,13 @@ const CreateEventForm = React.forwardRef(({ onEventCreated, onClose, TransitionC
             </Select>
           </FormControl>
         </Box>
-        <DialogActions>
-          <Button onClick={onClose} variant="outlined" disabled={loading}>Cancel</Button>
-          <Button type="submit" variant="contained" disabled={loading} startIcon={loading ? <CircularProgress size={20} /> : null}>
-            {loading ? 'Creating...' : 'Create Event'}
-          </Button>
-        </DialogActions>
       </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} variant="outlined" disabled={loading}>Cancel</Button>
+        <Button onClick={handleSubmit} variant="contained" disabled={loading} startIcon={loading ? <CircularProgress size={20} /> : null}>
+          {loading ? 'Creating...' : 'Create Event'}
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 });

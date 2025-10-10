@@ -25,20 +25,24 @@ exports.protect = (req, res, next) => {
 exports.isOwner = async (req, res, next) => {
     const { id } = req.params;
     const userId = req.user.id;
+    console.log(`[isOwner Middleware] Checking ownership for event ID: ${id} by user ID: ${userId}`);
 
     try {
         const event = inMemoryDb.getEventById(id);
         if (!event) {
+            console.log(`[isOwner Middleware] Event with ID: ${id} not found.`);
             return res.status(404).json({ error: 'Event not found.' });
         }
 
         if (event.owner_id !== userId) {
+            console.log(`[isOwner Middleware] User ${userId} is not the owner of event ${id}. Owner: ${event.owner_id}`);
             return res.status(403).json({ error: 'Forbidden: You do not own this resource.' });
         }
 
+        console.log(`[isOwner Middleware] User ${userId} is the owner of event ${id}. Proceeding.`);
         next();
     } catch (error) {
-        console.error('Error in isOwner middleware:', error);
+        console.error('[isOwner Middleware] Error in isOwner middleware:', error);
         res.status(500).json({ error: 'Server error' });
     }
 };

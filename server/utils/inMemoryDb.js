@@ -9,7 +9,19 @@ const users = [
     { id: '1', email: 'alice@example.com', password_hash },
 ];
 
-const events = [];
+const events = [
+    {
+        id: 'test-event-123',
+        title: 'Default Test Event',
+        description: 'This is a default event for testing purposes.',
+        location: 'Test Location',
+        date: new Date().toISOString(),
+        status: 'draft',
+        owner_id: '1', // Assuming '1' is the ID for alice@example.com
+        created_at: new Date(),
+        updated_at: new Date(),
+    }
+];
 
 const webhook_deliveries = new Set();
 
@@ -22,7 +34,6 @@ exports.getEventsByOwner = (owner_id) => events.filter(e => e.owner_id === owner
 exports.getEventById = (id) => events.find(e => e.id === id);
 
 exports.createEvent = (eventData) => {
-    console.log('inMemoryDb: Events before create:', events.length); // Added log
     const newEvent = {
         ...eventData,
         id: crypto.randomUUID(),
@@ -30,26 +41,31 @@ exports.createEvent = (eventData) => {
         updated_at: new Date(),
     };
     events.push(newEvent);
-    console.log('inMemoryDb: Events after create:', events.length, newEvent.id); // Added log
     return newEvent;
 };
 
-exports.updateEvent = (id, updateData) => {
+exports.updateEvent = (id, owner_id, updateData) => {
     const eventIndex = events.findIndex(e => e.id === id);
     if (eventIndex === -1) return null;
+
+    if (events[eventIndex].owner_id !== owner_id) {
+        return null; // Not authorized
+    }
 
     events[eventIndex] = { ...events[eventIndex], ...updateData, updated_at: new Date() };
     return events[eventIndex];
 };
 
-exports.deleteEvent = (id) => {
+exports.deleteEvent = (id, owner_id) => {
     const eventIndex = events.findIndex(e => e.id === id);
     if (eventIndex === -1) return false;
+
+    if (events[eventIndex].owner_id !== owner_id) {
+        return false; // Not authorized
+    }
 
     events.splice(eventIndex, 1);
     return true;
 };
 
 // --- Webhook Functions ---
-exports.hasDelivery = (delivery_id) => webhook_deliveries.has(delivery_id);
-exports.addDelivery = (delivery_id) => webhook_deliveries.add(delivery_id);

@@ -24,7 +24,7 @@ exports.handleExternalEvent = async (req, res) => {
             return res.status(404).json({ error: 'Event not found.' });
         }
 
-        inMemoryDb.updateEvent(event_id, { status: new_status });
+        inMemoryDb.updateEvent(event_id, event.owner_id, { status: new_status });
         inMemoryDb.addDelivery(delivery_id);
 
         console.log(`Webhook: Successfully updated event ${event_id} to ${new_status}.`);

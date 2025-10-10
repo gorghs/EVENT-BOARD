@@ -47,7 +47,6 @@ const MyEventsPage = () => {
       api.get('/api/events').then(response => {
         setEvents(response.data.events || []);
       }).catch(error => {
-        console.error('Failed to fetch events', error);
       }).finally(() => {
         setLoading(false);
       });
@@ -164,7 +163,7 @@ const MyEventsPage = () => {
       </Container>
 
       {openCreateModal && (
-        <Dialog open={openCreateModal} onClose={() => setOpenCreateModal(false)} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} TransitionComponent={Slide}>
+        <Dialog open={openCreateModal} onClose={() => setOpenCreateModal(false)}>
           <CreateEventForm onEventCreated={onEventCreated} onClose={() => setOpenCreateModal(false)} TransitionComponent={Slide} />
         </Dialog>
       )}

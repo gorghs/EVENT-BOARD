@@ -15,6 +15,7 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<LoginPage />} />
+          <Route path="/login" element={<LoginPage />} />
           {/** Register route removed */}
           <Route path="/discover" element={<DiscoverPage />} />
           <Route path="/my-events" element={<MyEventsPage />} />

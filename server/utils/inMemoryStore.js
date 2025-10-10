@@ -26,11 +26,16 @@ function getEvent(id) {
 }
 
 function updateEvent(id, owner_id, updates) {
-	const existing = eventsById.get(id);
-	if (!existing || existing.owner_id !== owner_id) return null;
-	const updated = { ...existing, ...updates, updated_at: new Date() };
-	eventsById.set(id, updated);
-	return { id, ...updated };
+    const existing = eventsById.get(id);
+    if (!existing) {
+        return null;
+    }
+    if (existing.owner_id !== owner_id) {
+        return null;
+    }
+    const updated = { ...existing, ...updates, updated_at: new Date() };
+    eventsById.set(id, updated);
+    return { id, ...updated };
 }
 
 function deleteEvent(id, owner_id) {
