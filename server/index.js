@@ -41,27 +41,23 @@
 //     // Seed the test user
 //     await seedUser();
 // });  onst express = require('express');
+const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser'); // body-parser is a good practice to include explicitly
+const bodyParser = require('body-parser');
 
 const authRoutes = require('./routes/authRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const webhookRoutes = require('./routes/webhookRoutes');
 const { seedUser } = require('./controllers/authController');
 
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Enable CORS for all origins
-// This is the simplest setup to accept all requests
 app.use(cors());
 
-// Use body-parser for all incoming requests (except webhooks, which need raw body)
-// Note: If your webhook needs a raw body, this global parser might interfere.
-// For this project's structure, it should be fine.
-app.use(express.json());
-
+// Use body-parser for incoming requests
+app.use(bodyParser.json());
 
 // Routes
 app.get('/healthz', (req, res) => res.status(200).send('OK'));
@@ -75,5 +71,4 @@ app.listen(PORT, async () => {
     // Seed the test user
     await seedUser();
 });
-
 
