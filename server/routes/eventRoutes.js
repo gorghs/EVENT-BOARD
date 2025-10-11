@@ -26,7 +26,6 @@ router.get('/:id',
 router.patch('/:id', 
     authMiddleware.protect, 
     authMiddleware.isOwner, 
-    validationMiddleware.validateEventUpdate, 
     eventController.updateEvent
 );
 
