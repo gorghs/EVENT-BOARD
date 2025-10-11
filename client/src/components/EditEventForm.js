@@ -64,8 +64,8 @@ const EditEventForm = React.forwardRef(({ event, open, onClose, onEventUpdated, 
       };
       const changed = Object.keys(currentFormState).some(key => {
         if (key === 'date') {
-          const initialDate = initialEventState.current.date;
-          const currentDate = currentFormState.date;
+          const initialDate = new Date(initialEventState.current.date).getTime();
+          const currentDate = new Date(currentFormState.date).getTime();
           return initialDate !== currentDate;
         }
         return initialEventState.current[key] !== currentFormState[key];
