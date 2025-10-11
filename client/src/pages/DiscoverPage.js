@@ -18,11 +18,14 @@ import {
   Button,
 } from '@mui/material';
 import { ArrowBack as ArrowBackIcon, Explore as ExploreIcon } from '@mui/icons-material';
+import EventDetailsDialog from '../components/EventDetailsDialog';
 
 const DiscoverPage = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,6 +43,15 @@ const DiscoverPage = () => {
 
     fetchPublicEvents();
   }, []);
+
+  const handleLearnMore = (event) => {
+    setSelectedEvent(event);
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+  };
 
   const renderSkeleton = () => (
     <Grid container spacing={3}>
@@ -100,7 +112,7 @@ const DiscoverPage = () => {
                     <Chip label={new Date(event.date).toLocaleDateString()} size="small" />
                   </CardContent>
                   <Box sx={{ p: 2, pt: 0 }}>
-                     <Button fullWidth variant="outlined" disabled>Learn More</Button>
+                     <Button fullWidth variant="outlined" onClick={() => handleLearnMore(event)}>Learn More</Button>
                   </Box>
                 </Card>
               </Grid>
@@ -108,6 +120,8 @@ const DiscoverPage = () => {
           </Grid>
         )}
       </Container>
+
+      <EventDetailsDialog event={selectedEvent} open={dialogOpen} onClose={handleCloseDialog} />
     </Box>
   );
 };

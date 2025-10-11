@@ -64,8 +64,8 @@ const EditEventForm = React.forwardRef(({ event, open, onClose, onEventUpdated, 
       };
       const changed = Object.keys(currentFormState).some(key => {
         if (key === 'date') {
-          const initialDate = initialEventState.current.date;
-          const currentDate = currentFormState.date;
+          const initialDate = new Date(initialEventState.current.date).getTime();
+          const currentDate = new Date(currentFormState.date).getTime();
           return initialDate !== currentDate;
         }
         return initialEventState.current[key] !== currentFormState[key];
@@ -79,9 +79,15 @@ const EditEventForm = React.forwardRef(({ event, open, onClose, onEventUpdated, 
     setErrorMessage('');
     setLoading(true);
     try {
+      // Delete the old event
+      await api.delete(`/api/events/${event.id}`);
+
+      // Create a new event with the updated information
       const payload = { title, description, location, status, date: new Date(date).toISOString() };
-      const response = await api.patch(`/api/events/${event.id}`, payload);
-      onEventUpdated(response.data);
+      const response = await api.post('/api/events', payload);
+
+      // Pass the new event to the parent component
+      onEventUpdated(event.id, response.data);
       onClose();
     } catch (error) {
       const msg = error?.response?.data?.error || 'Failed to update event';
