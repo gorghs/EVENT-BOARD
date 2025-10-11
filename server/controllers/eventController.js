@@ -71,7 +71,6 @@ const updateEvent = async (req, res) => {
         const updatedEvent = inMemoryDb.updateEvent(id, owner_id, { title, date, location, description, status });
         
         console.log(`[eventController.updateEvent] Result of updateEvent call:`, updatedEvent);
-
         if (!updatedEvent) {
             return res.status(404).json({ error: 'Event not found or user not authorized.' });
         }
