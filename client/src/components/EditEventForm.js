@@ -79,16 +79,11 @@ const EditEventForm = React.forwardRef(({ event, open, onClose, onEventUpdated, 
     setErrorMessage('');
     setLoading(true);
     try {
-      // Delete the old event
-      await api.delete(`/api/events/${event.id}`);
+    const payload = { title, description, location, status, date: new Date(date).toISOString() };
+    const response = await api.patch(`/api/events/${event.id}`, payload);
 
-      // Create a new event with the updated information
-      const payload = { title, description, location, status, date: new Date(date).toISOString() };
-      const response = await api.post('/api/events', payload);
-
-      // Pass the new event to the parent component
-      onEventUpdated(event.id, response.data);
-      onClose();
+    onEventUpdated(event.id, response.data);
+    onClose();
     } catch (error) {
       const msg = error?.response?.data?.error || 'Failed to update event';
       setErrorMessage(msg);

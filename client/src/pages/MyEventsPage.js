@@ -63,9 +63,9 @@ const MyEventsPage = () => {
     setOpenCreateModal(false);
   };
 
-  const onEventUpdated = (oldId, newEvent) => {
-    setEvents(prevEvents => [newEvent, ...prevEvents.filter(event => event.id !== oldId)]);
-  };
+    const onEventUpdated = (updatedEvent) => {
+        setEvents(events.map(event => event.id === updatedEvent.id ? updatedEvent : event));
+    };
 
   const onEventDeleted = (deletedId) => {
     setEvents(events.filter(event => event.id !== deletedId));

@@ -59,13 +59,9 @@ const getEventById = async (req, res) => {
     }
 };
 
-  async updateEvent(req, res) {
-    console.log('updateEvent: req.user:', req.user);
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ message: 'Unauthorized: User information missing.' });
-    }
+const updateEvent = async (req, res) => {
     const { id } = req.params;
-    const { title, description, date, location } = req.body;
+    const { title, date, location, description, status } = req.body;
     const owner_id = req.user.id;
 
     console.log(`[eventController.updateEvent] Received request to update event ${id}`);
