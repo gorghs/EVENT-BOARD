@@ -80,7 +80,11 @@ const MyEventsPage = () => {
 
   return (
     <Box sx={{ flexGrow: 1, minHeight: '100vh', bgcolor: 'background.default' }}>
-      <AppBar position="sticky" elevation={0}>
+            <AppBar position="sticky" elevation={0} sx={{
+        background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
+        color: 'white'
+      }}>
+
         <Toolbar>
           <EventIcon sx={{ mr: 2 }} />
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
@@ -123,13 +127,18 @@ const MyEventsPage = () => {
               <CircularProgress />
             ) : filteredEvents.length === 0 ? (
               <Box sx={{ textAlign: 'center', py: 8 }}>
-                <EventIcon sx={{ fontSize: 80, color: 'accent.main', mb: 2 }} />
-                <Typography variant="h5" color="text.secondary">No events found</Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-                  {searchTerm || statusFilter !== 'all' ? 'Try adjusting your filters' : 'Create your first event to get started!'}
+                <EventIcon sx={{ fontSize: 100, color: 'primary.main', mb: 2, opacity: 0.5 }} />
+                <Typography variant="h4" color="text.secondary" gutterBottom>
+                  No events to show
                 </Typography>
-                <Button variant="contained" onClick={() => setOpenCreateModal(true)}>Create Event</Button>
+                <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+                  {searchTerm || statusFilter !== 'all' ? 'Try adjusting your filters' : 'Create your first event and it will show up here!'}
+                </Typography>
+                <Button variant="contained" size="large" onClick={() => setOpenCreateModal(true)}>
+                  Create Your First Event
+                </Button>
               </Box>
+
             ) : (
               <EventList events={filteredEvents} onEventUpdated={onEventUpdated} onEventDeleted={onEventDeleted} />
             )}

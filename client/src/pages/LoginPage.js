@@ -9,6 +9,7 @@ import {
   Alert,
   CircularProgress,
   Container,
+  Paper,
 } from '@mui/material';
 import { Event as EventIcon } from '@mui/icons-material';
 
@@ -36,15 +37,15 @@ const LoginPage = () => {
 
   return (
     <Container component="main" maxWidth="xs">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <EventIcon sx={{ fontSize: 60, mb: 2, color: 'accent.main' }} />
+      <Paper elevation={3} sx={{
+        padding: 4,
+        marginTop: 8,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        borderRadius: 2, // Softer corners
+      }}>
+        <EventIcon sx={{ fontSize: 60, mb: 2, color: 'primary.main' }} />
         <Typography component="h1" variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
           EventBoard
         </Typography>
@@ -104,7 +105,7 @@ const LoginPage = () => {
             Use Demo Credentials
           </Button>
         </Box>
-      </Box>
+      </Paper>
     </Container>
   );
 };

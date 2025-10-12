@@ -73,7 +73,19 @@ const EventCard = ({ event, onEventUpdated, onEventDeleted }) => {
 
   return (
     <>
-      <Paper sx={{ p: 2, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', gap: 2, transition: 'all 0.3s', '&:hover': { boxShadow: 3 } }}>
+            <Paper sx={{ 
+          p: 2, 
+          display: 'flex', 
+          flexDirection: { xs: 'column', sm: 'row' }, 
+          alignItems: 'center', 
+          gap: 2, 
+          transition: 'all 0.3s ease-in-out',
+          '&:hover': { 
+            boxShadow: 6,
+            transform: 'scale(1.02)'
+          } 
+        }}>
+
         <Box sx={{ width: { xs: '100%', sm: 100 }, height: 100, borderRadius: 1, bgcolor: 'primary.main', color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
           <Typography variant="h5" sx={{ fontWeight: 700 }}>{format(new Date(event.date), 'dd')}</Typography>
           <Typography variant="body1">{format(new Date(event.date), 'MMM')}</Typography>
