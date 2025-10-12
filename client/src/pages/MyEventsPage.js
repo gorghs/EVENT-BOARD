@@ -18,12 +18,9 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Paper,
   Grid,
-  Modal,
-  Skeleton,
-  Slide,
   Dialog,
+  Slide,
 } from '@mui/material';
 import {
   Event as EventIcon,
@@ -81,26 +78,9 @@ const MyEventsPage = () => {
     return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}><CircularProgress /></Box>;
   }
 
-  const renderSkeletons = () => (
-    <Grid container spacing={3}>
-      {Array.from(new Array(3)).map((_, index) => (
-        <Grid item xs={12} key={index}>
-          <Paper sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Skeleton variant="rectangular" width={80} height={80} />
-            <Box sx={{ flexGrow: 1 }}>
-              <Skeleton variant="text" width="60%" />
-              <Skeleton variant="text" width="40%" />
-            </Box>
-            <Skeleton variant="circular" width={40} height={40} />
-          </Paper>
-        </Grid>
-      ))}
-    </Grid>
-  );
-
   return (
     <Box sx={{ flexGrow: 1, minHeight: '100vh', bgcolor: 'background.default' }}>
-      <AppBar position="static" color="primary" elevation={0}>
+      <AppBar position="sticky" elevation={0}>
         <Toolbar>
           <EventIcon sx={{ mr: 2 }} />
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
@@ -114,42 +94,36 @@ const MyEventsPage = () => {
       </AppBar>
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Paper sx={{ p: 3, mb: 4, borderRadius: 2, boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}>
-          <Grid container spacing={2} alignItems="center" justifyContent="space-between">
-            <Grid item>
-              <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>My Events</Typography>
-              <Typography variant="subtitle1" color="text.secondary">Manage and track your events.</Typography>
-            </Grid>
-            <Grid item>
-              <Button variant="contained" startIcon={<AddIcon />} onClick={() => setOpenCreateModal(true)}>Create Event</Button>
-            </Grid>
-          </Grid>
-          <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
-            <TextField
-              label="Search Events"
-              variant="outlined"
-              size="small"
-              fullWidth
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <FormControl size="small" sx={{ minWidth: 150 }}>
-              <InputLabel>Status</InputLabel>
-              <Select value={statusFilter} label="Status" onChange={(e) => setStatusFilter(e.target.value)}>
-                <MenuItem value="all">All</MenuItem>
-                <MenuItem value="draft">Draft</MenuItem>
-                <MenuItem value="published">Published</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-        </Paper>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+          <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>My Events</Typography>
+          <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => setOpenCreateModal(true)}>Create Event</Button>
+        </Box>
+
+        <Box sx={{ mb: 4, display: 'flex', gap: 2 }}>
+          <TextField
+            label="Search Events"
+            variant="outlined"
+            size="small"
+            fullWidth
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <FormControl size="small" sx={{ minWidth: 150 }}>
+            <InputLabel>Status</InputLabel>
+            <Select value={statusFilter} label="Status" onChange={(e) => setStatusFilter(e.target.value)}>
+              <MenuItem value="all">All</MenuItem>
+              <MenuItem value="draft">Draft</MenuItem>
+              <MenuItem value="published">Published</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
 
         <Box>
             {loading ? (
-              renderSkeletons()
+              <CircularProgress />
             ) : filteredEvents.length === 0 ? (
               <Box sx={{ textAlign: 'center', py: 8 }}>
-                <EventIcon sx={{ fontSize: 80, color: 'text.secondary', mb: 2 }} />
+                <EventIcon sx={{ fontSize: 80, color: 'accent.main', mb: 2 }} />
                 <Typography variant="h5" color="text.secondary">No events found</Typography>
                 <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
                   {searchTerm || statusFilter !== 'all' ? 'Try adjusting your filters' : 'Create your first event to get started!'}

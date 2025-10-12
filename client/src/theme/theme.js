@@ -1,72 +1,63 @@
 import { createTheme } from '@mui/material/styles';
 
-// A professional and modern theme for a production-ready look.
+// A modern and sophisticated theme for a premium look and feel.
 const theme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#1976d2', // A classic, professional blue
-      light: '#42a5f5',
-      dark: '#1565c0',
-      contrastText: '#ffffff',
+      main: '#1A202C', // Almost Black
     },
     secondary: {
-      main: '#009688', // A cool, complementary teal
-      light: '#4db6ac',
-      dark: '#00796b',
-      contrastText: '#ffffff',
+      main: '#2D3748', // Dark Gray
+    },
+    accent: {
+      main: '#38B2AC', // Teal
     },
     background: {
-      default: '#f4f6f8', // A very light grey for a soft, clean background
+      default: '#F7FAFC', // Very Light Gray
       paper: '#ffffff',
     },
     text: {
-      primary: '#212121', // Dark grey instead of pure black
-      secondary: '#757575',
-    },
-    success: {
-      main: '#2e7d32',
-    },
-    warning: {
-      main: '#ed6c02',
-    },
-    error: {
-      main: '#d32f2f',
+      primary: '#1A202C', // Almost Black
+      secondary: '#718096', // Gray
     },
   },
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    h1: { fontWeight: 700, fontSize: '2.5rem' },
-    h2: { fontWeight: 600, fontSize: '2rem' },
-    h3: { fontWeight: 600, fontSize: '1.75rem' },
-    h4: { fontWeight: 600, fontSize: '1.5rem' },
-    h5: { fontWeight: 600, fontSize: '1.25rem' },
-    h6: { fontWeight: 600, fontSize: '1.1rem' },
+    fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
+    h1: { fontWeight: 700, fontSize: '3rem' },
+    h2: { fontWeight: 700, fontSize: '2.5rem' },
+    h3: { fontWeight: 600, fontSize: '2rem' },
+    h4: { fontWeight: 600, fontSize: '1.75rem' },
+    h5: { fontWeight: 600, fontSize: '1.5rem' },
+    h6: { fontWeight: 600, fontSize: '1.25rem' },
     button: {
-      textTransform: 'none', // More modern than all-caps
+      textTransform: 'none',
       fontWeight: 600,
     },
   },
   shape: {
-    borderRadius: 8, // A slightly more subtle border radius
+    borderRadius: 16,
   },
   components: {
-    // Override default component styles for a cohesive look
     MuiAppBar: {
       styleOverrides: {
         root: {
-          boxShadow: '0 2px 4px -1px rgba(0,0,0,0.06), 0 4px 5px 0 rgba(0,0,0,0.06), 0 1px 10px 0 rgba(0,0,0,0.08)',
+          boxShadow: 'none',
+          backgroundColor: '#F7FAFC',
+          borderBottom: '1px solid #E2E8F0',
+          color: '#1A202C',
         },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
-          padding: '8px 22px',
-          transition: 'transform 0.2s ease-in-out',
+          borderRadius: 12,
+          padding: '12px 28px',
+          transition: 'all 0.3s ease-in-out',
           '&:hover': {
-            transform: 'scale(1.03)',
+            transform: 'translateY(-2px)',
+            boxShadow: '0 6px 16px rgba(0,0,0,0.12)',
           },
         },
       },
@@ -77,12 +68,13 @@ const theme = createTheme({
       },
       styleOverrides: {
         root: {
-          borderRadius: 12,
-          border: '1px solid #e0e0e0',
+          borderRadius: 20,
+          border: '1px solid #E2E8F0',
           transition: 'all 0.3s ease-in-out',
           '&:hover': {
-            boxShadow: '0 8px 16px 0 rgba(0,0,0,0.1)',
+            boxShadow: '0 12px 24px rgba(0,0,0,0.1)',
             borderColor: 'transparent',
+            transform: 'translateY(-6px)',
           },
         },
       },
@@ -91,7 +83,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            borderRadius: 8,
+            borderRadius: 12,
           },
         },
       },
@@ -100,8 +92,8 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           '& .MuiBackdrop-root': {
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-            backdropFilter: 'blur(3px)',
+            backgroundColor: 'rgba(26, 32, 44, 0.7)',
+            backdropFilter: 'blur(8px)',
           },
         },
       },
