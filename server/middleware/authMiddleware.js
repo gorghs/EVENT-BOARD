@@ -11,7 +11,7 @@ exports.protect = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'dev-secret'); // Added fallback
     req.user = decoded;
     console.log('Auth Middleware: Decoded user:', req.user);
     next();
