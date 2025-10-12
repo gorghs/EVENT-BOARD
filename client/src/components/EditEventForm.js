@@ -105,7 +105,7 @@ const EditEventForm = React.forwardRef(({ event, open, onClose, onEventUpdated, 
       <DialogContent>
         {errorMessage && <Alert severity="error" sx={{ mb: 2 }}>{errorMessage}</Alert>}
         
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+        <Box component="form" id="edit-event-form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
           <TextField fullWidth label="Event Title" value={title} onChange={(e) => setTitle(e.target.value)} required sx={{ mb: 2 }} />
           <TextField fullWidth label="Description" value={description} onChange={(e) => setDescription(e.target.value)} multiline rows={4} sx={{ mb: 2 }} />
           <TextField fullWidth label="Location" value={location} onChange={(e) => setLocation(e.target.value)} sx={{ mb: 2 }} />
@@ -122,7 +122,7 @@ const EditEventForm = React.forwardRef(({ event, open, onClose, onEventUpdated, 
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} variant="outlined" disabled={loading}>Cancel</Button>
-        <Button type="submit" variant="contained" disabled={loading || !hasChanges} startIcon={loading ? <CircularProgress size={20} /> : null}>
+        <Button type="submit" form="edit-event-form" variant="contained" disabled={loading || !hasChanges} startIcon={loading ? <CircularProgress size={20} /> : null}>
           {loading ? 'Updating...' : 'Update Event'}
         </Button>
       </DialogActions>
