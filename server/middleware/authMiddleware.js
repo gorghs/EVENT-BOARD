@@ -12,7 +12,7 @@ exports.protect = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded.user;
+    req.user = decoded;
     console.log('Auth Middleware: Decoded user:', req.user);
     next();
   } catch (err) {
