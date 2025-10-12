@@ -82,7 +82,7 @@ const EditEventForm = React.forwardRef(({ event, open, onClose, onEventUpdated, 
     const payload = { title, description, location, status, date: new Date(date).toISOString() };
     const response = await api.patch(`/api/events/${event.id}`, payload);
 
-    onEventUpdated(event.id, response.data);
+    onEventUpdated(response.data);
     onClose();
     } catch (error) {
       const msg = error?.response?.data?.error || 'Failed to update event';
