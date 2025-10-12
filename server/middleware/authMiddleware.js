@@ -20,7 +20,6 @@ exports.protect = (req, res, next) => {
     res.status(401).json({ message: `Token is not valid: ${err.message}` });
   }
 };
-    const { id } = req.params;
     const userId = req.user.id;
     console.log(`[isOwner Middleware] Checking ownership for event ID: ${id} by user ID: ${userId}`);
 
