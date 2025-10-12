@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const inMemoryDb = require('../utils/inMemoryDb');
 
 exports.protect = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
+  const token = req.headers.authorization?.split(' ')[1] || req.body.token;
   console.log('Auth Middleware: Token received:', token ? '[TOKEN_RECEIVED]' : '[NO_TOKEN]');
 
   if (!token) {
