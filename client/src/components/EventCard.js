@@ -1,13 +1,13 @@
+import { Calendar, Clock, MapPin, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import { CheckCircle, EditNote } from '@mui/icons-material';
 import React, { useState } from 'react';
 import EditEventForm from './EditEventForm';
 import api from '../api/api';
 import {
   Typography,
   Paper,
-  Grid,
   Button,
   Box,
-  Chip,
   IconButton,
   Dialog,
   DialogTitle,
@@ -17,15 +17,6 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material';
-import {
-  Delete as DeleteIcon,
-  Edit as EditIcon,
-  LocationOn as LocationIcon,
-  Schedule as ScheduleIcon,
-  Public as PublicIcon,
-  Drafts as DraftIcon,
-  MoreVert as MoreVertIcon,
-} from '@mui/icons-material';
 import { format } from 'date-fns';
 
 const EventCard = ({ event, onEventUpdated, onEventDeleted }) => {
@@ -61,89 +52,96 @@ const EventCard = ({ event, onEventUpdated, onEventDeleted }) => {
     }
   };
 
-  const getStatusChip = (status) => (
-    <Chip
-      icon={status === 'published' ? <PublicIcon /> : <DraftIcon />}
-      label={status}
-      color={status === 'published' ? 'success' : 'default'}
-      size="small"
-      variant="outlined"
-    />
-  );
+const getStatusStyles = (status) => {
+  if (status === 'published') {
+    return {
+      borderColor: 'success.main',
+      chipColor: 'success',
+      icon: <CheckCircle sx={{ color: 'success.main', fontSize: 20 }} />
+    };
+  }
+  return {
+    borderColor: 'warning.main',
+    chipColor: 'warning',
+    icon: <EditNote sx={{ color: 'warning.main', fontSize: 20 }} />
+  };
+};
 
-  return (
-    <>
-            <Paper sx={{ 
-          p: 2, 
-          display: 'flex', 
-          flexDirection: { xs: 'column', sm: 'row' }, 
-          alignItems: 'center', 
-          gap: 2, 
-          transition: 'all 0.3s ease-in-out',
-          '&:hover': { 
-            boxShadow: 6,
-            transform: 'scale(1.02)'
-          } 
-        }}>
 
-        <Box sx={{ width: { xs: '100%', sm: 100 }, height: 100, borderRadius: 1, bgcolor: 'primary.main', color: 'white', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-          <Typography variant="h5" sx={{ fontWeight: 700 }}>{format(new Date(event.date), 'dd')}</Typography>
-          <Typography variant="body1">{format(new Date(event.date), 'MMM')}</Typography>
+return (
+  <>
+    <Paper
+      elevation={0}
+      sx={{
+        display: 'flex',
+        borderRadius: 2,
+        border: '1px solid #dfe1e6',
+        transition: 'box-shadow 0.3s ease, border-color 0.3s ease',
+        '&:hover': {
+          boxShadow: '0 4px 12px rgba(23, 43, 77, 0.1)',
+          borderColor: 'primary.main',
+        },
+      }}
+    >
+      <Box sx={{
+        borderRight: '1px solid #dfe1e6',
+        p: 2.5,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        textAlign: 'center',
+        minWidth: 100,
+      }}>
+        <Typography variant="h5" sx={{ color: 'primary.main', fontWeight: 700 }}>
+          {format(new Date(event.date), 'dd')}
+        </Typography>
+        <Typography variant="body1" sx={{ color: 'text.secondary', fontWeight: 600, textTransform: 'uppercase' }}>
+          {format(new Date(event.date), 'MMM')}
+        </Typography>
+      </Box>
+
+      <Box sx={{ p: 2, flexGrow: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            {getStatusStyles(event.status).icon}
+            <Typography variant="h6" component="h2" sx={{ ml: 1, fontWeight: 600 }}>
+              {event.title}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, color: 'text.secondary', flexWrap: 'wrap' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Calendar size={14} />
+              <Typography variant="body2">{format(new Date(event.date), 'EEEE, MMMM d, yyyy')}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Clock size={14} />
+              <Typography variant="body2">{format(new Date(event.date), 'p')}</Typography>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <MapPin size={14} />
+              <Typography variant="body2">{event.location || 'Online'}</Typography>
+            </Box>
+          </Box>
         </Box>
-
-        <Box sx={{ flexGrow: 1, width: '100%' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <Typography variant="h6" component="h2" sx={{ fontWeight: 600, mb: 1 }}>{event.title}</Typography>
-            {getStatusChip(event.status)}
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary', mb: 1 }}>
-            <ScheduleIcon sx={{ fontSize: 16 }} />
-            <Typography variant="caption">{format(new Date(event.date), 'MMM dd, yyyy • h:mm a')}</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'text.secondary' }}>
-            <LocationIcon sx={{ fontSize: 16 }} />
-            <Typography variant="caption">{event.location || 'Not specified'}</Typography>
-          </Box>
-        </Box>
-
-        <Box sx={{ alignSelf: { xs: 'flex-end', sm: 'center' } }}>
-          <IconButton
-            aria-label="more"
-            id="long-button"
-            aria-controls={openMenu ? 'long-menu' : undefined}
-            aria-expanded={openMenu ? 'true' : undefined}
-            aria-haspopup="true"
-            onClick={handleMenuClick}
-          >
-            <MoreVertIcon />
+        <Box sx={{ ml: 1 }}>
+          <IconButton onClick={handleMenuClick}>
+            <MoreVertical size={20} />
           </IconButton>
-          <Menu
-            id="long-menu"
-            MenuListProps={{
-              'aria-labelledby': 'long-button',
-            }}
-            anchorEl={anchorEl}
-            open={openMenu}
-            onClose={handleMenuClose}
-            PaperProps={{
-              style: {
-                maxHeight: 48 * 4.5,
-                width: '20ch',
-              },
-            }}
-          >
+          <Menu anchorEl={anchorEl} open={openMenu} onClose={handleMenuClose}>
             <MenuItem onClick={handleEditClick}>
-              <EditIcon sx={{ mr: 1 }} /> Edit
+              <Edit size={16} style={{ marginRight: '8px' }}/> Edit
             </MenuItem>
-            <MenuItem onClick={handleDeleteClick}>
-              <DeleteIcon sx={{ mr: 1 }} /> Delete
+            <MenuItem onClick={handleDeleteClick} sx={{ color: 'error.main' }}>
+              <Trash2 size={16} style={{ marginRight: '8px' }}/> Delete
             </MenuItem>
           </Menu>
         </Box>
-      </Paper>
+      </Box>
+    </Paper>
 
-      {/* Edit Modal */}
-      {editModalOpen && (
+    {/* Modals remain unchanged */}
+    {editModalOpen && (
         <EditEventForm 
           event={event} 
           open={editModalOpen} 
@@ -151,10 +149,8 @@ const EventCard = ({ event, onEventUpdated, onEventDeleted }) => {
           onEventUpdated={onEventUpdated} 
           TransitionComponent={Slide}
         />
-      )}
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="xs" TransitionComponent={Slide}>
+    )}
+    <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="xs" TransitionComponent={Slide}>
         <DialogTitle>Delete Event</DialogTitle>
         <DialogContent>
           <Typography>Are you sure you want to delete "{event.title}"? This cannot be undone.</Typography>
@@ -163,9 +159,9 @@ const EventCard = ({ event, onEventUpdated, onEventDeleted }) => {
           <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
           <Button onClick={handleDeleteConfirm} color="error" variant="contained">Delete</Button>
         </DialogActions>
-      </Dialog>
-    </>
-  );
+    </Dialog>
+  </>
+);
 };
 
 export default EventCard;

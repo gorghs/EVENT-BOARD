@@ -1,103 +1,84 @@
 import { createTheme } from '@mui/material/styles';
 
-// A modern and sophisticated theme for a premium look and feel.
 const theme = createTheme({
   palette: {
-    mode: 'light',
     primary: {
-      main: '#1A202C', // Almost Black
+      main: '#0052cc', // A strong, professional Atlassian Blue
+      light: '#4c8cff',
+      dark: '#002a9a',
     },
     secondary: {
-      main: '#2D3748', // Dark Gray
-    },
-    accent: {
-      main: '#38B2AC', // Teal
+      main: '#ffab00', // A warm, energetic Amber for accents
+      contrastText: '#000',
     },
     background: {
-      default: '#F7FAFC', // Very Light Gray
+      default: '#f4f5f7', // A subtle, soft grey background
       paper: '#ffffff',
     },
     text: {
-      primary: '#1A202C', // Almost Black
-      secondary: '#718096', // Gray
+      primary: '#172b4d', // A dark, readable navy blue
+      secondary: '#6b778c', // A softer grey for secondary text
+    },
+    action: {
+      active: '#42526e',
+    },
+    success: {
+      main: '#36b37e',
+    },
+    warning: {
+      main: '#ffab00',
     },
   },
   typography: {
-    fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
-    h1: { fontWeight: 700, fontSize: '3rem' },
-    h2: { fontWeight: 700, fontSize: '2.5rem' },
-    h3: { fontWeight: 600, fontSize: '2rem' },
-    h4: { fontWeight: 600, fontSize: '1.75rem' },
-    h5: { fontWeight: 600, fontSize: '1.5rem' },
-    h6: { fontWeight: 600, fontSize: '1.25rem' },
-    button: {
-      textTransform: 'none',
-      fontWeight: 600,
-    },
+    fontFamily: '"Poppins", "Inter", "system-ui", "Avenir", "Helvetica", "Arial", sans-serif',
+    h4: { fontWeight: 600 },
+    h5: { fontWeight: 600 },
+    h6: { fontWeight: 600 },
   },
   shape: {
-    borderRadius: 16,
+    borderRadius: 8, // A modern, slightly rounded corner radius
   },
   components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none',
+          fontWeight: 600,
+          boxShadow: 'none',
+          '&:hover': {
+            boxShadow: 'none',
+          },
+        },
+      },
+      defaultProps: {
+        disableElevation: true,
+      }
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+        },
+      },
+    },
     MuiAppBar: {
       styleOverrides: {
         root: {
           boxShadow: 'none',
-          backgroundColor: '#F7FAFC',
-          borderBottom: '1px solid #E2E8F0',
-          color: '#1A202C',
+          borderBottom: '1px solid #dfe1e6',
         },
       },
     },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          padding: '12px 28px',
-          transition: 'all 0.3s ease-in-out',
-          '&:hover': {
-            transform: 'translateY(-2px)',
-            boxShadow: '0 6px 16px rgba(0,0,0,0.12)',
-          },
-        },
-      },
-    },
-    MuiCard: {
-      defaultProps: {
-        elevation: 0,
-      },
-      styleOverrides: {
-        root: {
-          borderRadius: 20,
-          border: '1px solid #E2E8F0',
-          transition: 'all 0.3s ease-in-out',
-          '&:hover': {
-            boxShadow: '0 12px 24px rgba(0,0,0,0.1)',
-            borderColor: 'transparent',
-            transform: 'translateY(-6px)',
-          },
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          '& .MuiOutlinedInput-root': {
-            borderRadius: 12,
-          },
-        },
-      },
-    },
-    MuiModal: {
-      styleOverrides: {
-        root: {
-          '& .MuiBackdrop-root': {
-            backgroundColor: 'rgba(26, 32, 44, 0.7)',
-            backdropFilter: 'blur(8px)',
-          },
-        },
-      },
-    },
+    MuiOutlinedInput: {
+        styleOverrides: {
+            root: {
+                backgroundColor: '#fafbfc',
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: '#0052cc',
+                },
+            }
+        }
+    }
   },
 });
 

@@ -4,7 +4,6 @@ import {
   Button,
   TextField,
   Box,
-  Typography,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -15,7 +14,6 @@ import {
   InputLabel,
   Alert,
   CircularProgress,
-  Paper,
 } from '@mui/material';
 
 const CreateEventForm = React.forwardRef(({ onEventCreated, onClose, TransitionComponent }, ref) => {

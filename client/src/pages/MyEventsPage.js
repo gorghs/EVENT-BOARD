@@ -1,3 +1,5 @@
+import { Plus, Search, LogOut, Compass } from 'lucide-react';
+import { StickyNote as EventNoteIcon } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth';
@@ -21,16 +23,12 @@ import {
   Grid,
   Dialog,
   Slide,
+  Paper,
+  InputAdornment,
 } from '@mui/material';
-import {
-  Event as EventIcon,
-  Explore as ExploreIcon,
-  Logout as LogoutIcon,
-  Add as AddIcon,
-} from '@mui/icons-material';
 
 const MyEventsPage = () => {
-  const isAuthenticated = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,8 +49,7 @@ const MyEventsPage = () => {
   }, [isAuthenticated]);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
+    logout();
   };
 
   const onEventCreated = (newEvent) => {
@@ -78,76 +75,90 @@ const MyEventsPage = () => {
     return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}><CircularProgress /></Box>;
   }
 
-  return (
-    <Box sx={{ flexGrow: 1, minHeight: '100vh', bgcolor: 'background.default' }}>
-            <AppBar position="sticky" elevation={0} sx={{
-        background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)',
-        color: 'white'
-      }}>
-
+return (
+    <Box sx={{ flexGrow: 1, bgcolor: 'background.default', minHeight: '100vh' }}>
+      <AppBar position="sticky" sx={{ bgcolor: 'background.paper' }}>
         <Toolbar>
-          <EventIcon sx={{ mr: 2 }} />
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 600 }}>
+          <EventNoteIcon color="#0052cc" style={{ marginRight: '16px' }} />
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: 'text.primary' }}>
             EventBoard
           </Typography>
-          <Button color="inherit" startIcon={<ExploreIcon />} onClick={() => navigate('/discover')} sx={{ mr: 1 }}>
+          <Button startIcon={<Compass size={18} />} sx={{ mr: 1 }} onClick={() => navigate('/discover')}>
             Discover
           </Button>
-          <IconButton color="inherit" onClick={handleLogout}><LogoutIcon /></IconButton>
+          <IconButton onClick={handleLogout}>
+            <LogOut size={20} />
+          </IconButton>
         </Toolbar>
       </AppBar>
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-          <Typography variant="h4" component="h1" sx={{ fontWeight: 700 }}>My Events</Typography>
-          <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => setOpenCreateModal(true)}>Create Event</Button>
+          <Typography variant="h4" component="h1">
+            My Events
+          </Typography>
+          <Button variant="contained" startIcon={<Plus size={18} />} onClick={() => setOpenCreateModal(true)}>
+            Create Event
+          </Button>
         </Box>
 
-        <Box sx={{ mb: 4, display: 'flex', gap: 2 }}>
-          <TextField
-            label="Search Events"
-            variant="outlined"
-            size="small"
-            fullWidth
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <FormControl size="small" sx={{ minWidth: 150 }}>
-            <InputLabel>Status</InputLabel>
-            <Select value={statusFilter} label="Status" onChange={(e) => setStatusFilter(e.target.value)}>
-              <MenuItem value="all">All</MenuItem>
-              <MenuItem value="draft">Draft</MenuItem>
-              <MenuItem value="published">Published</MenuItem>
-            </Select>
-          </FormControl>
-        </Box>
-
-        <Box>
-            {loading ? (
+        <Paper elevation={0} sx={{ p: 2, mb: 4, borderRadius: 2, border: '1px solid #dfe1e6' }}>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} md={8}>
+              <TextField
+                placeholder="Search by event title..."
+                fullWidth
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search size={20} color="#6b778c" />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth>
+                <InputLabel>Status</InputLabel>
+                <Select value={statusFilter} label="Status" onChange={(e) => setStatusFilter(e.target.value)}>
+                  <MenuItem value="all">All Statuses</MenuItem>
+                  <MenuItem value="draft">Draft</MenuItem>
+                  <MenuItem value="published">Published</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+        </Paper>
+        
+        {/* Event List / Loading / Empty State */}
+        {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
               <CircularProgress />
-            ) : filteredEvents.length === 0 ? (
-              <Box sx={{ textAlign: 'center', py: 8 }}>
-                <EventIcon sx={{ fontSize: 100, color: 'primary.main', mb: 2, opacity: 0.5 }} />
-                <Typography variant="h4" color="text.secondary" gutterBottom>
-                  No events to show
-                </Typography>
-                <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-                  {searchTerm || statusFilter !== 'all' ? 'Try adjusting your filters' : 'Create your first event and it will show up here!'}
-                </Typography>
-                <Button variant="contained" size="large" onClick={() => setOpenCreateModal(true)}>
-                  Create Your First Event
-                </Button>
-              </Box>
+            </Box>
+          ) : filteredEvents.length === 0 ? (
+            <Box sx={{ textAlign: 'center', py: 8, px: 3 }}>
+              <EventNoteIcon size={120} color="text.secondary" style={{ opacity: 0.5, marginBottom: '16px' }} />
+              <Typography variant="h5" color="text.primary" gutterBottom sx={{ fontWeight: 600, mt: 2 }}>
+                No Events to Display
+              </Typography>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+                It looks like you haven't created any events yet.
+              </Typography>
+              <Button variant="contained" onClick={() => setOpenCreateModal(true)}>
+                Create Your First Event
+              </Button>
+            </Box>
+          ) : (
+            <EventList events={filteredEvents} onEventUpdated={onEventUpdated} onEventDeleted={onEventDeleted} />
+          )}
 
-            ) : (
-              <EventList events={filteredEvents} onEventUpdated={onEventUpdated} onEventDeleted={onEventDeleted} />
-            )}
-          </Box>
       </Container>
-
+      {/* Modals remain the same */}
       {openCreateModal && (
-        <Dialog open={openCreateModal} onClose={() => setOpenCreateModal(false)}>
-          <CreateEventForm onEventCreated={onEventCreated} onClose={() => setOpenCreateModal(false)} TransitionComponent={Slide} />
+        <Dialog open={openCreateModal} onClose={() => setOpenCreateModal(false)} TransitionComponent={Slide} maxWidth="sm" fullWidth>
+            <CreateEventForm onEventCreated={onEventCreated} onClose={() => setOpenCreateModal(false)} />
         </Dialog>
       )}
     </Box>

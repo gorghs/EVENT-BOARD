@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
@@ -63,9 +64,19 @@ const DiscoverPage = () => {
     </Grid>
   );
 
-  return (
+return (
+    // Replace the main Box with this one to use the theme's default background
     <Box sx={{ flexGrow: 1, minHeight: '100vh', bgcolor: 'background.default' }}>
-      <AppBar position="sticky" elevation={0}>
+      <AppBar
+        position="sticky"
+        elevation={0}
+        sx={{
+          backgroundColor: 'rgba(30, 30, 30, 0.7)', // Semi-transparent dark glass
+          backdropFilter: 'blur(10px)',
+          borderBottom: '1px solid',
+          borderColor: 'rgba(255, 255, 255, 0.12)',
+        }}
+      >
         <Toolbar>
           <IconButton color="inherit" onClick={() => navigate('/my-events')}>
             <ArrowBackIcon />
@@ -78,38 +89,44 @@ const DiscoverPage = () => {
       </AppBar>
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
-        {loading ? (
-          renderSkeleton()
-        ) : (
-          <Grid container spacing={4}>
-            {events.map((event) => (
-              <Grid item xs={12} sm={6} md={4} key={`${event.external_id}-${event.source}`}>
-                <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                  <CardHeader
-                    title={<Typography variant="h6" sx={{ fontWeight: 600 }}>{event.title}</Typography>}
-                    subheader={`Source: ${event.source}`}
-                  />
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      {event.description}
-                    </Typography>
-                    <Chip label={new Date(event.date).toLocaleDateString()} size="small" />
-                  </CardContent>
-                  <Box sx={{ p: 2, pt: 0 }}>
-                     <Button fullWidth variant="contained" color="primary" onClick={() => handleLearnMore(event)}>Learn More</Button>
-                  </Box>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        )}
+          {loading ? (
+            renderSkeleton()
+          ) : (
+            <Grid container spacing={4}>
+              {events.map((event) => (
+                <Grid item xs={12} sm={6} md={4} key={`${event.external_id}-${event.source}`}>
+                  <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                    <CardHeader
+                      title={<Typography variant="h6" sx={{ fontWeight: 600 }}>{event.title}</Typography>}
+                      subheader={`Source: ${event.source}`}
+                    />
+                    <CardContent sx={{ flexGrow: 1 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        {event.description}
+                      </Typography>
+                      <Chip label={new Date(event.date).toLocaleDateString()} size="small" />
+                    </CardContent>
+                    <Box sx={{ p: 2, pt: 0 }}>
+                       <Button fullWidth variant="contained" color="primary" onClick={() => handleLearnMore(event)}>Learn More</Button>
+                    </Box>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </motion.div>
       </Container>
 
       <EventDetailsDialog event={selectedEvent} open={dialogOpen} onClose={handleCloseDialog} />
     </Box>
-  );
+);
 };
 
 export default DiscoverPage;

@@ -7,7 +7,6 @@ import {
   Typography,
   Button,
   Box,
-  Chip,
 } from '@mui/material';
 import { CalendarToday, LocationOn } from '@mui/icons-material';
 

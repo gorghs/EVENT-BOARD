@@ -1,65 +1,52 @@
 import React, { useState } from 'react';
+import { Box, Typography, TextField, Button, Paper, CircularProgress, Alert, Container } from '@mui/material';
+import { StickyNote as EventNoteIcon } from 'lucide-react';
+import useAuth from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import api from '../api/api';
-import {
-  TextField,
-  Button,
-  Typography,
-  Box,
-  Alert,
-  CircularProgress,
-  Container,
-  Paper,
-} from '@mui/material';
-import { Event as EventIcon } from '@mui/icons-material';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { login, loading, errorMessage } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setErrorMessage('');
-    setLoading(true);
-    try {
-      const response = await api.post('/auth/login', { email, password });
-      localStorage.setItem('token', response.data.token);
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    const success = await login(email, password);
+    if (success) {
       navigate('/my-events');
-    } catch (error) {
-      setErrorMessage('Login failed. Please check your credentials.');
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <Container component="main" maxWidth="xs">
-      <Paper elevation={3} sx={{
-        padding: 4,
-        marginTop: 8,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        borderRadius: 2, // Softer corners
-      }}>
-        <EventIcon sx={{ fontSize: 60, mb: 2, color: 'primary.main' }} />
+    <Container component="main" maxWidth="xs" sx={{ display: 'flex', alignItems: 'center', height: '100vh' }}>
+      <Paper elevation={3} sx={{ p: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+        <Box
+          sx={{
+            bgcolor: 'primary.main',
+            color: 'white',
+            borderRadius: '50%',
+            p: 2,
+            mb: 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <EventNoteIcon size={40} />
+        </Box>
         <Typography component="h1" variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
           EventBoard
         </Typography>
-        <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
+        <Typography component="h2" variant="h6" color="text.secondary" sx={{ mb: 2 }}>
           Sign in to your account
         </Typography>
-
         {errorMessage && (
-          <Alert severity="error" sx={{ mb: 2, width: '100%' }}>
+          <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
             {errorMessage}
           </Alert>
         )}
-
-        <Box component="form" onSubmit={handleLogin} noValidate sx={{ mt: 1, width: '100%' }}>
+        <Box component="form" noValidate onSubmit={handleLogin} sx={{ mt: 1, width: '100%' }}>
           <TextField
             margin="normal"
             required
@@ -71,6 +58,13 @@ const LoginPage = () => {
             autoFocus
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: 'primary.main',
+                },
+              },
+            }}
           />
           <TextField
             margin="normal"
@@ -83,12 +77,18 @@ const LoginPage = () => {
             autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '&.Mui-focused fieldset': {
+                  borderColor: 'primary.main',
+                },
+              },
+            }}
           />
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            color="primary"
             disabled={loading}
             sx={{ mt: 3, mb: 2, py: 1.5 }}
           >
